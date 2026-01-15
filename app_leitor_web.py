@@ -96,10 +96,11 @@ else:
     voz_id = "google"
 
 import pypdf
+from docx import Document
 
 # 2. Entrada de Texto (Area ou Upload)
 st.subheader("Entrada de Texto")
-arquivo = st.file_uploader("📂 Carregar Arquivo (PDF ou TXT)", type=["pdf", "txt"])
+arquivo = st.file_uploader("📂 Carregar Arquivo (PDF, TXT ou Word)", type=["pdf", "txt", "docx"])
 
 texto_inicial = ""
 if arquivo is not None:
@@ -111,6 +112,12 @@ if arquivo is not None:
                 texto_inicial += page.extract_text() + "\n"
         except Exception as e:
             st.error(f"Erro ao ler PDF: {e}")
+    elif arquivo.name.endswith(".docx"):
+        try:
+            doc = Document(arquivo)
+            texto_inicial = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+        except Exception as e:
+            st.error(f"Erro ao ler Word: {e}")
     else: # TXT
         texto_inicial = arquivo.read().decode("utf-8")
 
@@ -127,10 +134,21 @@ if st.button("▶️ Gerar Áudio", type="primary"):
             
             # DEBUG: Mostrar o que será lido
             with st.expander("Ver Texto Limpo (Debug)"):
+                st.write(f"**Caracteres:** {len(texto_limpo)}")
                 st.write(texto_limpo)
 
             if not texto_limpo:
                 st.error("O texto não contém caracteres válidos para leitura.")
+            elif len(texto_limpo) > 5000:
+                st.error(f"""
+                ⚠️ **Texto muito longo!**
+                
+                Seu texto tem {len(texto_limpo)} caracteres.
+                
+                **Limite máximo:** 5000 caracteres
+                
+                **Solução:** Divida o texto em partes menores ou remova trechos.
+                """)
             else:
                 try:
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
@@ -150,7 +168,24 @@ if st.button("▶️ Gerar Áudio", type="primary"):
                             run_edge_tts_sync(texto_limpo, voz_id, temp_path)
                             st.success("Áudio Neural pronto!")
                         except Exception as e_neural:
-                            st.warning(f"Voz Neural falhou ({e_neural}). Usando Google automaticamente...")
+                            erro_msg = str(e_neural)
+                            
+                            # Mensagem amigável para erro 429 (rate limit)
+                            if "429" in erro_msg or "too many" in erro_msg.lower():
+                                st.warning(f"""
+                                ⏱️ **Limite temporário atingido**
+                                
+                                A Microsoft Edge TTS tem um limite de uso gratuito. 
+                                
+                                **Soluções:**
+                                - Aguarde 5-10 minutos e tente novamente
+                                - Ou selecione a voz **"Google"** no menu acima (funciona sempre)
+                                - Use textos menores para evitar o limite
+                                """)
+                            else:
+                                st.warning(f"Voz Neural falhou ({erro_msg}). Tentando Google...")
+                            
+                            # Fallback para Google
                             from gtts import gTTS
                             tts = gTTS(text=texto_limpo, lang='pt', slow=False)
                             tts.save(temp_path)
@@ -163,4 +198,18 @@ if st.button("▶️ Gerar Áudio", type="primary"):
                         st.download_button("💾 Baixar MP3", file, "audio_gerado.mp3", "audio/mp3")
                     
                 except Exception as e:
-                    st.error(f"Erro fatal ao gerar áudio: {e}")
+                    st.error(f"""
+                    ❌ **Erro fatal ao gerar áudio**
+                    
+                    **Detalhes técnicos:** {str(e)}
+                    
+                    **Possíveis causas:**
+                    - Texto muito longo (limite: 5000 caracteres)
+                    - Problema de conexão com a internet
+                    - Caracteres inválidos no texto
+                    
+                    **Sugestões:**
+                    - Tente com um texto menor
+                    - Verifique o "Ver Texto Limpo" acima
+                    - Aguarde alguns segundos e tente novamente
+                    """)
