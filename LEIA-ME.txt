@@ -1,0 +1,34 @@
+═══════════════════════════════════════════════════════════
+    📦 ARQUIVOS PRONTOS PARA O GITHUB
+═══════════════════════════════════════════════════════════
+
+Esta pasta contém TODOS os arquivos que você deve enviar para o GitHub.
+
+ARQUIVOS INCLUÍDOS:
+✅ app_leitor_web.py .......... Código principal do app
+✅ requirements.txt ........... Bibliotecas necessárias
+✅ .gitignore ................. Arquivos a ignorar
+✅ README.md .................. Descrição do projeto
+
+PRÓXIMOS PASSOS:
+
+1. Acesse: https://github.com
+2. Faça login (ou crie conta)
+3. Clique no "+" → "New repository"
+4. Nome: leitor-voz-neural
+5. Marque "Public" e "Add README"
+6. Clique "Create repository"
+7. Clique "Add file" → "Upload files"
+8. ARRASTE TODOS OS 4 ARQUIVOS DESTA PASTA
+9. Escreva: "Upload inicial"
+10. Clique "Commit changes"
+
+Depois:
+→ Acesse https://share.streamlit.io
+→ Conecte seu GitHub
+→ Selecione o repositório
+→ Deploy!
+
+═══════════════════════════════════════════════════════════
+Pasta: E:\canal memoria da criação\TREINANDO IA\GITHUB_UPLOAD
+═══════════════════════════════════════════════════════════

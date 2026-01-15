@@ -1,0 +1,6 @@
+streamlit
+edge-tts
+asyncio
+pypdf
+gTTS
+nest_asyncio
