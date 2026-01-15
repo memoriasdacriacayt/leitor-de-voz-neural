@@ -4,3 +4,4 @@ asyncio
 pypdf
 gTTS
 nest_asyncio
+python-docx
